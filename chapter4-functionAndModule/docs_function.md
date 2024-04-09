@@ -28,5 +28,52 @@
     - bool(42), bool('apple'), bool([23, 33]) => true 
 
 
+## 파이썬에서는 매개변수를 전달할 때 값을 전달할까? 레퍼런스를 전달할까? 
 
+- call by value(값에 의한 호출방식) : 함수 인자의 변수에 `값이 사용`되는 기법 
+
+함수의 suite에서 값이 변경되더라도 함수가 호출한 코드의 변수값은 바뀌지 않는다. 
+즉, 원래 변수값을 복사해서 인자로 전달한다고 생각할 수 있다.
+
+만약에 함수 suite에서 변경된 값을 전달받고 싶다면
+해당 함수의 return을 통해서 전달받아야 한다. 
+
+- call by reference(레퍼런스에 의한 호출방식) : 함수를 호출한 코드의 변수에 링크를 유지한다. 
+
+함수 suite에서 변수값이 변경된다면 함수를 호출한 코드의 변수값도 바뀐다. 
+
+원래 변수에 이름만 다르게 붙여 인자로 전달한다고 생각할 수 있다. 
+
+그렇기 때문에 굳이 함수 suite에서 변경된 값을 받기 위해 return을 이용할 필요가 없다. 
+
+- 예시 메소드 
+```
+def double(arg) : 
+    print('Before: ', arg)
+    arg = arg * 2
+    print('After: ', arg)
+
+def change(arg) : 
+    print('Before: ', arg)
+    arg.append('More data')
+    print('After: ', arg)
+```
+
+- 상황 1
+```
+nums = 10
+double(num)을 한 이후에 
+nums는 여전히 10 
+```
+
+- 상황 2 
+```
+numbers = [42, 256, 16]
+change(numbers)을 한 이후에
+numbers = [42, 256, 16, 'More data']로 변경됨 
+```
+
+그렇다. 파이썬 함수 인자는 call by value, call by reference 모두 지원한다. 
+
+p.227
 
