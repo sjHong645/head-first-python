@@ -41,3 +41,4 @@ Running on http://127.0.0.1:5000
 127.0.0.1 - - [10/Apr/2024 15:09:27] "GET / HTTP/1.1" 200
 ```
 
+### 코드의 동작 설명 - webapp/hello_flask.py 직접 확인할 것
