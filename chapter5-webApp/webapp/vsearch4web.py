@@ -14,6 +14,8 @@ def do_search() -> 'html':
     letters = request.form['letters']
     title = 'Here are your results:'
     results = str(search4letters(phrase, letters))
+    log_request(request, results) # 해당 메소드를 호출함으로써 
+                                  # requests, results를 vsearch.log 파일에 작성함 
 
     # 요청으로 받은 데이터를 사용하도록 
     # 각각의 데이터를 매개변수를 통해 전달함.
@@ -35,6 +37,17 @@ def do_search() -> 'html':
 def entry_page() -> 'html':
     return render_template('entry.html',
                            the_title='Welcome to search4letters on the web!')
+    
+
+def log_request(req : 'flask_request', res : str) -> None : 
+    
+    # 매개변수로 전달받은 req, res를 
+    # vsearch.log 라는 파일에 작성하겠다는 의미 
+    with open('vsearch.log', 'a') as vsearch_log : 
+        
+        print(req, res, file = vsearch_log)
+        
+        
 
 if __name__ == '__main__':
 
