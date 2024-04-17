@@ -47,7 +47,16 @@ def log_request(req : 'flask_request', res : str) -> None :
         
         print(req, res, file = vsearch_log)
         
+@app.route('/viewlog')       
+def view_the_log() -> str : 
+    
+    # /viewlog URL에 접근하면
+    
+    with open('vsearch.log') as log : # vsearch.log 파일을 열어서 
+        contents = log.read() # 읽어들이고 
         
+    return contents # 반환한다.
+                    # 즉, vsearch.log 파일의 내용이 웹 브라우저에 출력된다. 
 
 if __name__ == '__main__':
 
