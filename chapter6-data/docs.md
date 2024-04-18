@@ -120,3 +120,42 @@ Markup('This is a Request')
 >>> escape('This is a <Request>') 
 Markup('This is a &lt;Request&gt;') # 특수문자을 표현한 문자열에 escape를 사용함 
 ```
+
+### 로깅되는 내용을 좀 더 유용하게 바꾸기
+
+- 현재까지 상황에서 로깅되는 내용 
+```
+<Request 'http://localhost:5000/search4' [POST]> {'o', 'i', 'e'}
+<Request 'http://localhost:5000/search4' [POST]> {'o', 'i', 'e'}
+<Request 'http://localhost:5000/search4' [POST]> {'i', 'o', 'e'}
+```
+
+로깅된 결과는 다르지만 로깅된 웹 요청은 모두 동일하다. 
+
+웹 요청을 객체 수준에서 로깅하고 있어서 중요한 내용은 요청 객체 안에 들어있다. 
+`dir() 메소드`를 사용해서 메서드와 속성 목록을 로깅하도록 해보자.
+
+`dir() 메소드`를 사용해서 로그 파일을 출력하니 이런 결과가 나온다. 
+```
+['__annotations__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__enter__', '__eq__', '__exit__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_cached_json', '_get_file_stream', '_get_stream_for_parsing', '_load_form_data', '_parse_content_type', '_parsed_content_type', 'accept_charsets', 'accept_encodings', 'accept_languages', 'accept_mimetypes', 'access_control_request_headers', 'access_control_request_method', 'access_route', 'application', 'args', 'authorization', 'base_url', 'blueprint', 'blueprints', 'cache_control', 'close', 'content_encoding', 'content_length', 'content_md5', 'content_type', 'cookies', 'data', 'date', 'dict_storage_class', 'endpoint', 'environ', 'files', 'form', 'form_data_parser_class', 'from_values', 'full_path', 'get_data', 'get_json', 'headers', 'host', 'host_url', 'if_match', 'if_modified_since', 'if_none_match', 'if_range', 'if_unmodified_since', 'input_stream', 'is_json', 'is_multiprocess', 'is_multithread', 'is_run_once', 'is_secure', 'json', 'json_module', 'list_storage_class', 'make_form_data_parser', 'max_content_length', 'max_form_memory_size', 'max_form_parts', 'max_forwards', 'method', 'mimetype', 'mimetype_params', 'on_json_loading_failed', 'origin', 'parameter_storage_class', 'path', 'pragma', 'query_string', 'range', 'referrer', 'remote_addr', 'remote_user', 'root_path', 'root_url', 'routing_exception', 'scheme', 'script_root', 'server', 'shallow', 'stream', 'trusted_hosts', 'url', 'url_root', 'url_rule', 'user_agent', 'user_agent_class', 'values', 'view_args', 'want_form_data_parsed'] {'i', 'o', 'e'}
+```
+
+이 중에서 수행한 검사 결과는 맨 마지막에 있는 `{'i', 'o', 'e'}`이다. 
+
+로그 결과를 보니 단순히 검사 결과뿐만 아니라 던더, 원더, 메서드와 관련된 모든 속성을 포함한다는 걸 알 수 있다. 
+
+모든 속성들을 다 로깅할 필요는 없고 중요한 3가지 속성만 살펴보자.
+
+- req.form : 웹 앱의 HTML 폼에서 보낸 정보
+- req.remote_addr : 웹 브라우저가 실행 중인 IP주소
+- req.user_agent : 데이터를 전송한 브라우저 정보 
+
+위 3가지 정보만 출력해서 결과를 보자. 
+
+```
+ImmutableMultiDict([('phrase', 'lookinggoodperson'), ('letters', 'aeiou')])
+127.0.0.1
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36
+{'o', 'e', 'i'}
+```
+

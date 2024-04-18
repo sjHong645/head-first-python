@@ -46,8 +46,26 @@ def log_request(req : 'flask_request', res : str) -> None :
     # vsearch.log 라는 파일에 작성하겠다는 의미 
     with open('vsearch.log', 'a') as vsearch_log : 
         
-        print(req, res, file = vsearch_log)        
+        # print(req, res, file = vsearch_log)        
+        # print(str(dir(req)), res, file = vsearch_log)
         
+        """ print(req.form, file = vsearch_log) 
+        print(req.remote_addr, file = vsearch_log) 
+        print(req.user_agent, file = vsearch_log) 
+        print(res, file = vsearch_log)  """
+        
+        # 각 print문에서 개행 문자를 파이프 문자로 변경함 
+        # 이러면 4줄로 출력되던 데이터가 1줄로 출력됨 
+        # 구분자는 '|'를 사용했음 
+        """ print(req.form, file = vsearch_log, end = '|') 
+        print(req.remote_addr, file = vsearch_log, end = '|') 
+        print(req.user_agent, file = vsearch_log, end = '|') 
+        print(res, file = vsearch_log)  """
+        
+        # 하나의 print문에 한꺼번에 출력되도록 할 수도 있음
+        # 물론 한 행의 길이가 너무 길어서 PEP 8 가이드라인을 준수하지는 않았지만
+        # 준수하지 않는다고 그리 큰 문제는 되지 않음 
+        print(req.form, req.remote_addr, req.user_agent, res, file = vsearch_log, sep = '|')
         
 @app.route('/viewlog')       
 def view_the_log() -> str : 
