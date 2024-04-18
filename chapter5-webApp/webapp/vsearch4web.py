@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from vsearch import search4letters
+from markupsafe import escape
 
 app = Flask(__name__)
 
@@ -45,7 +46,8 @@ def log_request(req : 'flask_request', res : str) -> None :
     # vsearch.log 라는 파일에 작성하겠다는 의미 
     with open('vsearch.log', 'a') as vsearch_log : 
         
-        print(req, res, file = vsearch_log)
+        print(req, res, file = vsearch_log)        
+        
         
 @app.route('/viewlog')       
 def view_the_log() -> str : 
@@ -55,8 +57,11 @@ def view_the_log() -> str :
     with open('vsearch.log') as log : # vsearch.log 파일을 열어서 
         contents = log.read() # 읽어들이고 
         
-    return contents # 반환한다.
-                    # 즉, vsearch.log 파일의 내용이 웹 브라우저에 출력된다. 
+    return escape(contents) # 반환한다.
+                            # 즉, vsearch.log 파일의 내용이 웹 브라우저에 출력된다. 
+                            
+                            # escape 메소드를 사용함으로써
+                            # HTML 특수 문자를 화면에 그대로 출력할 수 있다. 
 
 if __name__ == '__main__':
 

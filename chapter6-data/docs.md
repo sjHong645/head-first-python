@@ -102,3 +102,21 @@ with open('todos.txt') as tasks:
 브라우저는 기본적으로 꺽쇠괄호(`<>`)를 HTML 태그로 처리한다. 그러나 `<Request>`는 유효한 HTML 태그가 아니므로 이 태그를 무시하고 아무것도 출력하지 않은 것이다. 
 
 그렇다면, 어떻게 해야 우리가 원하는 데이터를 브라우저의 화면을 통해 볼 수 있을까? 
+
+### 데이터 이스케이프
+
+- escaping : 특수한 HTML 문자가 HTML로 해석되지 않고 화면으로 출력될 수 있도록 HTML 특수 문자를 인코딩하는 기법 
+    ex. `<` : `&lt;` / `>` : `&gt;`
+
+flaks에서는 Jinja2에서 상속받은 `escape 함수`를 갖고 있다. 
+가공되지 않은 데이터를 출력할 때 escape 함수를 사용하면 HTML 특수 문자를 escape한 문자열을 제공한다. 
+
+```
+>>> from markupsafe import escape
+
+>>> escape('This is a Request')
+Markup('This is a Request')
+
+>>> escape('This is a <Request>') 
+Markup('This is a &lt;Request&gt;') # 특수문자을 표현한 문자열에 escape를 사용함 
+```
