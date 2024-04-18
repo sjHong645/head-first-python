@@ -72,15 +72,27 @@ def view_the_log() -> str :
     
     # /viewlog URL에 접근하면
     
-    with open('vsearch.log') as log : # vsearch.log 파일을 열어서 
+    """ with open('vsearch.log') as log : # vsearch.log 파일을 열어서 
         contents = log.read() # 읽어들이고 
         
     return escape(contents) # 반환한다.
                             # 즉, vsearch.log 파일의 내용이 웹 브라우저에 출력된다. 
                             
                             # escape 메소드를 사용함으로써
-                            # HTML 특수 문자를 화면에 그대로 출력할 수 있다. 
-
+                            # HTML 특수 문자를 화면에 그대로 출력할 수 있다.  """
+                            
+    """로그 파일을 HTML 테이블 형태로 출력하는 코드 """
+    contents = []
+    with open('vsearch.log') as log:
+        for line in log:
+            contents.append([])
+            for item in line.split('|'):
+                contents[-1].append(escape(item))
+    titles = ('Form Data', 'Remote_addr', 'User_agent', 'Results')
+    return render_template('viewlog.html',
+                           the_title='View Log',
+                           the_row_titles=titles,
+                           the_data=contents,)
 if __name__ == '__main__':
 
     # 원래는 코드를 수정하고 나면 웹앱을 중지하고 재시작해야 하는데
