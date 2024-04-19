@@ -74,3 +74,30 @@ def __enter__(self) -> 'cursor' :
 
 이미 생성자를 통해 전달받은 내용을 가지고 `연결(conn)`을 만들고 `커서(cursor)`를 만들어서 반환한다. 
 
+#### __exit__ 메소드 구현 
+
+`__exit__` 메서드는 with문이 끝났을 때 수행할 마무리 코드를 실행한다. 
+
+- 기존 코드의 마무리 부문 
+```
+conn.commit()
+cursor.close()
+conn.close()
+```
+
+실행 순서를 정리하면 다음과 같다. 
+1. 데이터베이스로 커밋
+2. 커서 닫기
+3. 데이터베이스 연결 닫기
+
+DB로 어떤 작업을 수행할 때 마다 이 코드들이 필요하니까 3개 행의 코드를 `__exit__`로 옮겨서 컨택스트 관리자 클래스에 기능을 추가하자.
+
+```
+# 에러가 발생했을 때 3개의 인자를 전달한다.
+# 이에 관해서는 좀 더 뒤에서 다루도록 하자. 
+def __exit__(self, exc_type, exc_value, exc_trace) -> None: 
+        
+        self.conn.commit()
+        self.cursor.close()
+        self.conn.close()
+```
