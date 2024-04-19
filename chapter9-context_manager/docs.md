@@ -39,7 +39,14 @@ with문의 suite가 예외 발생 등으로 정상적으로 동작하지 않을 
 - 아래 코드에서 `__enter__`, `__exit__`, `__init__`이 어디에 호출되었는지 살펴보자.
 
 ```
+# 1. 인터프리터가 with문을 만났을 때 open과 연관된 __init__을 호출함 
+# 2. __init__을 실행하고 나서 open 메소드의 호출 결과가 tasks 변수에 할당되도록 인터프리터가 __enter__를 호출함 
 with open('todos.txt') as tasks : 
     for chors in tasks : 
         print(chore, end = '')
+
+# 3. with문이 끝나면 마무리 작업을 수행하도록 인터프리터가 __exit__을 호출함 
+# 여기서는 인터프리터에 의해 열린 파일이 모두 닫힘 
 ```
+
+

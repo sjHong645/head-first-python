@@ -6,7 +6,9 @@ import mysql.connector
 class UseDatabase : 
     
     def __init__(self, dbconfig : dict) -> None :
-        """ self.host = dbconfig['host']
+        """ 
+        # 내가 쓴 오답
+        self.host = dbconfig['host']
         self.user = dbconfig['user']
         self.password = dbconfig['password']
         self.database = dbconfig['database']
