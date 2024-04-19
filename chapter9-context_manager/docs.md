@@ -49,4 +49,28 @@ with open('todos.txt') as tasks :
 # 여기서는 인터프리터에 의해 열린 파일이 모두 닫힘 
 ```
 
+#### __enter__ 메소드 구현 
+`__enter__` 메서드는 with문의 suite를 실행하기 전에 필요한 설정 코드를 수행할 수 있는 기회를 제공한다. 
+
+기존 코드 부분 
+```
+conn = mysql.connector.connect(**dbconfig)
+cursor = conn.cursor() 
+```
+
+위 코드를 보면 MySQL 연결을 위한 딕셔너리를 이용해서 DB와 연결한 다음 
+그 연결을 가지고 커서를 만들었다. 
+
+즉, DB로 명령을 전달하는 코드를 구현할 때 마다 이러한 설정 작업을 해줘야 한다. 
+그렇다는 건 `__enter__` 메소드를 구현할 때 저 설정작업 내용을 넣어주면 되겠다.
+
+```
+def __enter__(self) -> 'cursor' : 
+        self.conn = mysql.connector.connect(**self.configuration)
+        self.cursor = self.conn.cursor()
+        
+        return self.cursor
+```
+
+이미 생성자를 통해 전달받은 내용을 가지고 `연결(conn)`을 만들고 `커서(cursor)`를 만들어서 반환한다. 
 
