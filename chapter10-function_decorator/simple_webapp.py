@@ -1,5 +1,7 @@
 from flask import Flask, session
 
+from checker import check_logged_in
+
 app = Flask(__name__)
 
 # 모든 URL이 공개되어 있어서 누구나 브라우저로 접근할 수 있다. 
@@ -9,16 +11,19 @@ def hello():
 
 
 @app.route('/page1')
+@check_logged_in # page1, page2, page3에 장식자를 적용함 
 def page1():
     return 'This is page 1.'
 
 
 @app.route('/page2')
+@check_logged_in
 def page2():
     return 'This is page 2.'
 
 
 @app.route('/page3')
+@check_logged_in
 def page3():
     return 'This is page 3.'
 
