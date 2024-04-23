@@ -6,15 +6,17 @@ import mysql.connector
 class UseDatabase : 
     
     def __init__(self, dbconfig : dict) -> None :
+               
+        self.configuration = dbconfig
+        
         """ 
         # 내가 쓴 오답
         self.host = dbconfig['host']
         self.user = dbconfig['user']
         self.password = dbconfig['password']
         self.database = dbconfig['database']
-        self.port = dbconfig['port'] """
-        
-        self.configuration = dbconfig
+        self.port = dbconfig['port'] 
+        """
     
     def __enter__(self) -> 'cursor' : 
         self.conn = mysql.connector.connect(**self.configuration)
