@@ -27,3 +27,47 @@ chapter10-function_decorator\decorator_prerequisite.md을 통해
 이 일을 하는 이유 - 로그인 상태 확인 코드를 복사/붙여넣기 하지 않는 더 좋은 방법으로 추가하기 위함 
 
 ## 함수 장식자 만들기 
+
+- 최종적으로 만들어진 장식자 코드 
+```
+from flask import session
+
+from functools import wraps
+
+def check_logged_in(func) : 
+    @wraps(func) 
+    def wrapper(*args, **kwargs): 
+        if 'logged_in' in session :
+            return func(*args, **kwargs)
+        
+        return 'You are NOT logged in'
+
+    return wrapper
+```
+
+- 장식자를 적용한 부분 
+```
+@app.route('/page2')
+@check_logged_in
+def page2():
+    return 'This is page 2.'
+```
+
+page2 함수에 장식자 하나만 추가함으로써 원하는 기능을 추가할 수 있게 되었다. 만약 해당 페이지에 로그인 확인 기능을 빼고 싶다면 장식자만 삭제하면 된다. 
+
+### 장식자의 장점
+1. 로직 추상화 
+2. 기존 함수의 코드를 바꾸지 않고도 기존 함수의 동작을 변경 가능
+
+
+### 코드에 새로운 기능을 추가한다는 점에서 컨텍스트 관리자와 장식자 기능은 같지 않은가? 
+
+같은 점도 있고 다른 점도 있다. 
+
+- 공통점 : 둘 다 기존 코드에 로직을 추가로 제공한다는 점 
+
+- 차이점
+    - 장식자 
+        1. 기존 함수에 새로운 기능을 추가하는데 최적화
+        2. 장식된 함수를 호출한 다음 어떤 작업을 하도록 정의하는 규칙이 없다. 
+    - 컨텍스트 관리자 : 특정 컨텍스트 안에서 코드를 실행하면서 with문 이전 그리고 with문이 끝난 다음에 적절하게 코드가 실행되도록 관리하는 것이 주된 목적 

@@ -19,9 +19,14 @@ def check_logged_in(func) :
 
     @wraps(func) # 해당 장식자를 사용함으로써 장식자 생성을 마무리한다. 
     def wrapper(*args, **kwargs): 
+
+        # 해당 조건을 만족하면 
+        # 장식된 함수를 그대로 실행 
         if 'logged_in' in session :
             return func(*args, **kwargs)
         
+        # 만족하지 않는다면
+        # 'You are NOT logged in' 문자열 출력 
         return 'You are NOT logged in'
 
     return wrapper
