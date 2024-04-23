@@ -85,4 +85,3 @@ quick_session.py를 실행하면서 session에 브라우저별로 상태값을 �
 이 사실을 바탕으로 vsearch4web.py 에서 사용자를 제한하는 기능을 추가할 수 있다. 
 
 직접 vsearch4web.py를 이용하기 전에 simple_webapp.py라는 파일을 만들어서 실험한 이후에 작업을 진행하도록 하자. 
-
