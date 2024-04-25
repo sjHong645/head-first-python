@@ -133,3 +133,152 @@ except PermissionError :
 ```
 
 하지만, 앞선 2가지 예외 말고도 예상하지 못한 에러가 또 발생할 수 있다. 
+파이썬의 내장 예외의 종류는 굉장히 많다. 그 모든 except suite를 구현한다는 건 현실적으로 불가능하다. 
+
+그래서 아래와 같이 지정하지 않은 모든 런타임 에러를 잡아서 처리할 수 있도록 기능을 제공한다. 
+
+특정 예외를 지정하지 않고 앞선 2개의 예외가 아닌 다른 에러가 발생한 경우 실행하도록 하는 코드를 작성했다. 
+```
+try : 
+    with open('myfile.txt') as fh : 
+        file_data = fh.read()
+    print(file_data)
+
+except FileNotFoundError : 
+    print('The data file is missing')
+
+except PermissionError : 
+    print('This is not allowed')
+
+except : 
+    print('Some other error occured')
+```
+
+### 예외 처리를 할 때 코드에 어떤 문제가 일어났는지 알 수 없게 되었다. 
+
+어떤 예외가 발생했는지 아는 것이 중요할 때가 있다. 그래서 Python에서는 가장 최근에 처리된 예외 정보와 관련된 데이터를 제공한다. 
+
+`sys 모듈`을 이용 또는 `확장된 try/except 문법`. 이 2가지 기법이 있다. 
+
+### `sys`로 예외 정보 얻기 
+
+sys 모듈 : 인터프리터 내부 정보에 접근할 수 있는 모듈 
+
+ex) `exc_info 메소드` : 현재 처리 중인 예외의 정보를 제공한다. 
+
+exc_info()의 반환값 = 튜플 (예외의 유형, 예외 값, 역추적 메시지에 접근하는데 필요한 역추적 객체) 
+
+이용할 수 있는 예외가 없다면 `(None, None, None)` 튜플이 반환된다. 
+
+ex) 
+```
+>>> import sys
+>>> try : 
+...     1/0 
+... except : 
+...     err = sys.exc_info()
+
+        # 튜플로 반환된 값을 하나씩 출력하기
+...     for e in err : 
+...             print(e) 
+... 
+<class 'ZeroDivisionError'> # 예외 유형
+division by zero # 예외 값
+<traceback object at 0x000001F14E4CEF80> # 역추적 객체 
+```
+
+### 추가 try/except 문법
+
+앞서 살펴본 예시 코드를 다시 살펴보자. 
+
+```
+try : 
+    with open('myfile.txt') as fh : 
+        file_data = fh.read()
+    print(file_data)
+
+except FileNotFoundError : 
+    print('The data file is missing')
+
+except PermissionError : 
+    print('This is not allowed')
+
+# 이 부분 
+except : 
+    print('Some other error occured')
+```
+
+위 코드의 `이 부분`을 보면 모든 에러를 잡을 수는 있지만 발생한 에러가 어떤 에러인지 알 수 없다는 문제가 있다. 
+
+그래서 `이 부분`을 다음과 같이 수정하면 발생한 에러가 어떤 에러인지 확인할 수 있다. 
+
+```
+# 최상위 예외객체인 Exception을 변수 err로 할당해서 
+# 그 내용을 출력하도록 했다. 
+except Exception as err: 
+    print('Some other error occured:', str(err))
+```
+
+## DBcm 모듈 다시보기 
+
+UseDatabase는 3개의 메소드를 실행한다고 했다. 
+아무런 문제가 없다면 3개의 메소드가 착착 동작한다. 
+
+- `__init__`은 with를 실행하기 전에 설정할 수 있도록 함
+- `__enter__`는 with문이 시작될 때 실행됨
+- `__exit__`는 with문이 종료될 때 실행됨 
+
+하지만, 문제가 발생하면 동작이 달라진다. 
+
+백엔드 DB를 이용할 수 없다면 `__enter__`코드가 제대로 실행되지 않을 수 있다. 
+그래서 DB 연결을 수립할 수 없을 땐 커스텀 예외를 발생하도록 `__enter__`를 고친다. 
+
+### 커스텀 예외 만들기 
+
+ex) `ConnectionError`라는 커스텀 예외를 만든다.
+```
+# Exception 클래스를 상속받는 ConnectionError라는 새로운 클래스를 만듦
+>>> class ConnectionError(Exception) :
+...     pass 
+...
+>>> raise ConnectionError("Yes. it is")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ConnectionError: Yes. it is
+
+>>> try :                           
+...     raise ConnectionError("Whoops")
+... except ConnectionError as err :
+...     print("Got:", str(err))      
+...
+Got: Whoops
+```
+
+- chapter11-exception_handling\DBcm.py 31번째 줄
+
+
+- DBcm에서 발생할 수 있는 또 다른 오류 
+```
+def __enter__(self) -> 'cursor' : 
+        
+        try : 
+            # 이 부분에서 사용자 인증 정보가 잘못될 수 있음 
+            # 이때, ProgrammingError가 발생한다. 
+            # 해당 에러는 with문을 실행하는 도중에 발생한다. 
+            self.conn = mysql.connector.connect(**self.configuration)
+            self.cursor = self.conn.cursor()
+            
+            return self.cursor
+    
+        except mysql.connector.errors.InterfaceError as err : 
+                raise ConnectionError(err)
+
+# with suite 안에서 발생했지만 잡지 못한 예외가 있다면
+# 잡지 못한 예외의 세부 정보를 __exit__ 메서드에서 처리하도록 전달할 수 있다. 
+def __exit__(self, exc_type, exc_value, exc_trace) -> None: 
+        
+        self.conn.commit()
+        self.cursor.close()
+        self.conn.close()
+```
+

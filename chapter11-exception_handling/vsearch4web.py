@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, escape
 from vsearch import search4letters
 
-from DBcm import UseDatabase
+from DBcm import UseDatabase, ConnectionError, CredentialError, SQLError
 
 app = Flask(__name__)
 
@@ -13,7 +13,7 @@ app.config['dbconfig'] = {'host': '127.0.0.1',
 
 def log_request(req: 'flask_request', res: str) -> None:
     """Log details of the web request and the results."""
-
+    
     with UseDatabase(app.config['dbconfig']) as cursor:
         _SQL = """insert into log
                   (phrase, letters, ip, browser_string, results)
@@ -52,16 +52,41 @@ def entry_page() -> 'html':
 @app.route('/viewlog')
 def view_the_log() -> 'html':
     """Display the contents of the log file as a HTML table."""
-    with UseDatabase(app.config['dbconfig']) as cursor:
-        _SQL = """select phrase, letters, ip, browser_string, results
-                  from log"""
-        cursor.execute(_SQL)
-        contents = cursor.fetchall()
-    titles = ('Phrase', 'Letters', 'Remote_addr', 'User_agent', 'Results')
-    return render_template('viewlog.html',
-                           the_title='View Log',
-                           the_row_titles=titles,
-                           the_data=contents,)
+    
+    try : 
+        # with문 내에서 발생하는 오류는 
+        # 컨텍스트 매니저의 __enter__ 에서 오류 출력 
+        with UseDatabase(app.config['dbconfig']) as cursor:
+            
+            # with문을 지나고 나서 발생하는 오류는
+            # 컨텍스트 매니저의 __exit__ 에서 오류 출력 
+            # 여기서 오류가 발생하면 __exit__ 메소드에 
+            # 예외의 유형, 예외 값, 예외 역추적 정보 3가지 인자가 전달된다. 
+            _SQL = """select phrase, letters, ip, browser_string, results
+                    from log"""
+            cursor.execute(_SQL)
+            contents = cursor.fetchall()
+            
+        titles = ('Phrase', 'Letters', 'Remote_addr', 'User_agent', 'Results')
+        return render_template('viewlog.html',
+                            the_title='View Log',
+                            the_row_titles=titles,
+                            the_data=contents,)
+    
+    # 컨텍스트 매니저의 __enter__에서 발생하는 2가지 예외를 처리하는 코드 
+    # ConnectionError, CredentialError
+    except ConnectionError as err : 
+        print('Is your database switched on? Error:', str(err))
+        
+    except CredentialError as err : 
+        print('User-id/Password issues. Error:', str(err))
+    
+    # __exit__에서 발생하는 예외를 처리하는 코드 
+    except SQLError as err : 
+        print('Is your query correct? Error:', str(err))
+    
+    except Exception as err : 
+        print('Something went wrong:', str(err))
 
 
 if __name__ == '__main__':
