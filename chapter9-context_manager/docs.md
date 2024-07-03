@@ -1,6 +1,6 @@
 ## Context Manager protocol(컨텍스트 관리 프로토콜)
 
-`before_context_applied.py`를 with 문과 연결할 수 있도록 고치는 작업을 이번 장에서 할 것이다. 
+[before_context_applied.py](./before_context_applied.py)를 with 문과 연결할 수 있도록 고치는 작업을 이번 장에서 할 것이다. 
 
 `프로토콜`이란 반드시 지켜야 하는 합의된 절차 또는 규칙 집합을 말한다. 
 
