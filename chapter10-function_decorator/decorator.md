@@ -1,4 +1,4 @@
-chapter10-function_decorator\decorator_prerequisite.md을 통해 
+[decorator_prerequisite.md](./decorator_prerequisite.md)을 통해 
 
 장식자를 만드는데 필요한 모든 Python 기법들을 살펴봤다. 
 
